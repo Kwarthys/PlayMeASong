@@ -2,6 +2,7 @@ package pms.generation.builders;
 
 import pms.generation.MelodyLine;
 import pms.generation.MelodyLineParameters;
+import pms.generation.MelodyLine.PatternFormat;
 import pms.notes.Instrument;
 import pms.notes.NoteCommand;
 import pms.notes.instruments.ElectroHigh;
@@ -33,45 +34,23 @@ public class LeadBuilder extends InstrumentLineBuilder
 	@Override
 	public void buildBar(int startStep)
 	{
-		MelodyLine baseLine = null;
-		
-		for(int i = 0; i < 8; i++)
-		{
-			MelodyLine line;
-			
-			if(baseLine == null)
-			{
-				baseLine = MelodyLine.generateANewLine(lastNoteIndex, melodyParameters);
-				line = baseLine;
-			}
-			else if(i < 4)
-			{
-				line = MelodyLine.createVariation(melodyParameters, baseLine);
-			}
-			else if(i < 6)
-			{
-				line = MelodyLine.createVariation(melodyParameters, baseLine, 2);
-			}
-			else
-			{
-				line = MelodyLine.createVariation(melodyParameters, baseLine, 4);
-			}
-			
-			//System.out.println(line);
-			
+		MelodyLine[] lines = MelodyLine.generatePattern(PatternFormat.ABACABAD, lastNoteIndex, melodyParameters);
+
+		int i = 0;
+		for(MelodyLine line : lines)
+		{			
 			for(NoteCommand n : line.notes)
 			{
-				//System.out.print(n.timestep + " - - ");
 				
 				NoteCommand timedNote = new NoteCommand(n);				
 				timedNote.timestep += startStep + i*8;
 				
-				//System.out.println(n.timestep + " to " + (n.noteDuration + n.timestep));
-				
 				track.addNote(timedNote);				
 
 				lastNoteIndex = n.scaleIndex;
+				
 			}	
+			++i;
 		}
 	}
 

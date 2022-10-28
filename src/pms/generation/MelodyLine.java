@@ -8,6 +8,8 @@ import pms.utils.SilencePrint;
 
 public class MelodyLine
 {
+	public enum PatternFormat{ ABACABAD}
+	
 	public ArrayList<NoteCommand> notes = new ArrayList<>();
 	
 	public MelodyLine(MelodyLine toCopy)
@@ -33,6 +35,62 @@ public class MelodyLine
 	{
 		
 	}
+	
+	
+	public static MelodyLine[] generatePattern(PatternFormat format, int lastNoteIndex, MelodyLineParameters params)
+	{
+		int[] formatArray = new int[8];
+		
+		if(format == PatternFormat.ABACABAD)
+		{
+			formatArray[0] = 0; //A
+			formatArray[1] = 1; //B
+			formatArray[2] = 0; //A 
+			formatArray[3] = 2; //C
+			formatArray[4] = 0; //A
+			formatArray[5] = 1; //B
+			formatArray[6] = 0; //A
+			formatArray[7] = 3; //D
+		}		
+
+		return generatePatternOfFormat(formatArray, lastNoteIndex, params);
+	}
+	
+	private static MelodyLine[] generatePatternOfFormat(int[] format, int lastNoteIndex, MelodyLineParameters params)
+	{
+		int maxIndex = 0;
+		
+		for(int i = 0; i < format.length; ++i)
+		{
+			maxIndex = Math.max(format[i], maxIndex);
+		}
+		
+		MelodyLine[] patterns = new MelodyLine[maxIndex+1];
+		
+		//System.out.println("Generating " + (maxIndex+1) + " lines.");
+		
+		MelodyLine baseLine = generateANewLine(lastNoteIndex, params);
+		
+		patterns[0] = baseLine;
+		//System.out.println(patterns[0] + " : BaseLine");
+		
+		for(int i = 1; i < patterns.length; ++i)
+		{
+			patterns[i] = createVariation(params, baseLine, 1+(int)(Math.random()*Math.random()*(3+i)));
+			
+			//System.out.println(patterns[i] + " : Var" + i);
+		}
+
+		MelodyLine[] lines = new MelodyLine[8];
+		
+		for(int i = 0; i < format.length; ++i)
+		{
+			lines[i] = patterns[format[i]];
+		}
+		
+		return lines;
+	}
+	
 
 	public static MelodyLine generateANewLine(int lastNoteIndex, MelodyLineParameters params)
 	{
